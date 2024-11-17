@@ -1,0 +1,13 @@
+{
+    "name": "SnapLabs Assistant",
+    "description": "AI assistant for SnapLabs information",
+    "theme": "dark",
+    "hide_cot": true,
+    "userEnv": false,
+    "markdown": true,
+    "message_loading": true,
+    "chat_settings": {
+        "streaming": false,
+        "default_expand_messages": true
+    }
+}

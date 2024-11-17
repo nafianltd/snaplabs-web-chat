@@ -5,15 +5,10 @@ FROM python:3.9-slim
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 
-# Install system dependencies
+# Install minimal system dependencies
 RUN apt-get update && apt-get install -y \
-    curl \
     graphviz \
     && rm -rf /var/lib/apt/lists/*
-
-# Install Ollama
-RUN curl -L https://ollama.ai/download/ollama-linux-amd64 -o /usr/local/bin/ollama \
-    && chmod +x /usr/local/bin/ollama
 
 # Create and set working directory
 WORKDIR /app
@@ -32,9 +27,6 @@ RUN mkdir -p logs
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
-ollama serve &\n\
-sleep 5\n\
-ollama pull mistral\n\
 if [ "$USE_CHAINLIT" = "true" ]; then\n\
     exec chainlit run app.py --host 0.0.0.0 --port $PORT\n\
 else\n\

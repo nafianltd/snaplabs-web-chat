@@ -1,16 +1,16 @@
 from typing import List, Dict
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_community.llms import Ollama
+from langchain_openai import ChatOpenAI
 import os
 
 class RAGAgent:
     def __init__(self, knowledge_base_path: str):
-        self.embeddings = OllamaEmbeddings(model="nomic-embed-text")
-        self.llm = Ollama(model="mistral")
+        self.embeddings = OpenAIEmbeddings()
+        self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
         self.knowledge_base_path = knowledge_base_path
         self.vector_store = None
         

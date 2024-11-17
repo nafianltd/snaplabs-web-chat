@@ -140,7 +140,7 @@ class KnowledgeBase:
 class SnapLabsAssistant:
     """Main assistant class that handles conversation and knowledge retrieval."""
     def __init__(self):
-        self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
+        self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
         self.kb = KnowledgeBase()
         
         # Create system prompt

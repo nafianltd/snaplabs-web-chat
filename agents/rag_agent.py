@@ -10,7 +10,7 @@ import os
 class RAGAgent:
     def __init__(self, knowledge_base_path: str):
         self.embeddings = OpenAIEmbeddings()
-        self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+        self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
         self.knowledge_base_path = knowledge_base_path
         self.vector_store = None
         

@@ -1,4 +1,4 @@
-chainlit==0.7.501
+chainlit==0.7.700
 langchain-community>=0.0.10
 langchain-core>=0.0.10
 langchain-openai>=0.0.3
@@ -7,7 +7,7 @@ graphviz>=0.20.1
 python-dotenv>=1.0.0
 numpy>=1.24.0
 fastapi>=0.104.1
-uvicorn>=0.23.2,<0.24.0  # Pinned to be compatible with Chainlit
+uvicorn>=0.23.2,<0.24.0
 
 # Dependencies of dependencies
 aiohttp>=3.8.0

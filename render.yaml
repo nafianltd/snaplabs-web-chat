@@ -3,10 +3,10 @@ services:
     name: snaplabs-chatbot
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    startCommand: chainlit run app.py --host 0.0.0.0 --port $PORT
     envVars:
       - key: USE_CHAINLIT
-        value: false
+        value: true
       - key: OPENAI_API_KEY
         sync: false # This will be set manually in Render dashboard
     autoDeploy: true

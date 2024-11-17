@@ -1,9 +1,7 @@
 from typing import List, Dict, Any
 from langchain.schema import HumanMessage, AIMessage
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.tools import Tool
-from langchain_community.llms import Ollama
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 import logging
 import chainlit as cl
 import numpy as np
@@ -38,16 +36,13 @@ class KnowledgeBase:
         self.embeddings_cache = None
         logger.info(f"Initializing KnowledgeBase with docs directory: {docs_dir}")
         try:
-            self.embeddings = OllamaEmbeddings(
-                model="mistral",
-                base_url="http://localhost:11434"
-            )
+            self.embeddings = OpenAIEmbeddings()
             # Test the connection
             self.embeddings.embed_query("test")
-            logger.info("Successfully connected to Ollama embeddings service")
+            logger.info("Successfully connected to OpenAI embeddings service")
         except Exception as e:
-            logger.error(f"Failed to initialize Ollama embeddings: {str(e)}")
-            raise RuntimeError("Failed to initialize Ollama. Is the service running?")
+            logger.error(f"Failed to initialize OpenAI embeddings: {str(e)}")
+            raise
         
         self._load_knowledge_base()
         if not self.knowledge_base:
@@ -145,11 +140,7 @@ class KnowledgeBase:
 class SnapLabsAssistant:
     """Main assistant class that handles conversation and knowledge retrieval."""
     def __init__(self):
-        self.llm = Ollama(
-            model="mistral",
-            base_url="http://localhost:11434",
-            temperature=0.7
-        )
+        self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
         self.kb = KnowledgeBase()
         
         # Create system prompt
@@ -172,22 +163,22 @@ class SnapLabsAssistant:
             # Get relevant content from knowledge base
             context = self.kb.get_relevant_content(message)
             
-            # Create prompt with context
+            # Create prompt
             prompt = ChatPromptTemplate.from_template(self.system_prompt)
             
             # Generate response
             response = self.llm.invoke(
                 prompt.format(
-                    context=context,
+                    context=context if context else "No specific context available.",
                     query=message
                 )
             )
             
-            return str(response)
+            return response.content
             
         except Exception as e:
             logger.error(f"Error processing message: {str(e)}")
-            return "I apologize, but I encountered an error while processing your message. Please try again."
+            raise
 
 # Initialize the assistant
 assistant = SnapLabsAssistant()
@@ -213,6 +204,7 @@ async def chat(chat_message: ChatMessage):
         response = await assistant.process_message(chat_message.message)
         return {"response": response}
     except Exception as e:
+        logger.error(f"Error processing message: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @cl.on_chat_start
@@ -245,37 +237,11 @@ async def on_message(message: cl.Message):
         await cl.Message(content="I apologize, but something went wrong. Please try again.").send()
 
 if __name__ == "__main__":
-    # Create architecture diagram
-    dot = graphviz.Digraph(comment='SnapLabs AI Assistant Architecture')
-    
-    # Add nodes
-    dot.attr('node', shape='box', style='rounded')
-    dot.node('User', 'User')
-    dot.node('Chainlit', 'Chainlit Interface')
-    dot.node('Assistant', 'SnapLabs Assistant')
-    dot.node('LLM', 'Ollama LLM\n(Mistral)')
-    dot.node('KB', 'Knowledge Base')
-    dot.node('Docs', 'Markdown Docs')
-    
-    # Add edges
-    dot.edge('User', 'Chainlit', 'sends message')
-    dot.edge('Chainlit', 'Assistant', 'routes message')
-    dot.edge('Assistant', 'KB', 'queries')
-    dot.edge('KB', 'Docs', 'reads')
-    dot.edge('Assistant', 'LLM', 'generates response')
-    dot.edge('LLM', 'Assistant', 'returns response')
-    dot.edge('Assistant', 'Chainlit', 'sends response')
-    dot.edge('Chainlit', 'User', 'displays response')
-    
-    # Save the diagram
-    dot.render('architecture', format='png', cleanup=True)
-    logger.info("Architecture diagram saved as 'architecture.png'")
-
-    # Ensure Ollama service is running
-    try:
-        assistant.llm.invoke("test")
-        logger.info("Successfully connected to Ollama service")
-    except Exception as e:
-        logger.error(f"Failed to connect to Ollama service: {str(e)}")
-        logger.error("Please make sure Ollama is running and the mistral model is installed")
-        raise RuntimeError("Failed to connect to Ollama service")
+    # Check if we should run in Chainlit mode
+    if os.getenv("USE_CHAINLIT", "false").lower() == "true":
+        # Chainlit will handle the running
+        pass
+    else:
+        # Run in FastAPI mode
+        import uvicorn
+        uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))

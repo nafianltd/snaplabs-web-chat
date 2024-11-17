@@ -7,7 +7,7 @@ graphviz>=0.20.1
 python-dotenv>=1.0.0
 numpy>=1.24.0
 fastapi>=0.104.1
-uvicorn>=0.24.0
+uvicorn>=0.23.2,<0.24.0  # Pinned to be compatible with Chainlit
 
 # Dependencies of dependencies
 aiohttp>=3.8.0

@@ -1,6 +1,6 @@
 from typing import List, Dict, Any
-from langchain.schema import HumanMessage, AIMessage
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 import logging
 import chainlit as cl

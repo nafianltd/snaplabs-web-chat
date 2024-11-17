@@ -2,11 +2,15 @@ services:
   - type: web
     name: snaplabs-chatbot
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: chainlit run app.py --host 0.0.0.0 --port $PORT
+    buildCommand: |
+      python3 -m pip install --upgrade pip
+      python3 -m pip install -r requirements.txt
+    startCommand: python3 -m chainlit run app.py --host 0.0.0.0 --port $PORT
     envVars:
       - key: USE_CHAINLIT
-        value: true
+        value: "true"
       - key: OPENAI_API_KEY
         sync: false # This will be set manually in Render dashboard
+      - key: PYTHON_VERSION
+        value: 3.9.18
     autoDeploy: true
